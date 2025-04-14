@@ -1,0 +1,4 @@
+networkx~=3.4.2
+PyQt5~=5.15.11
+matplotlib~=3.10.1
+Wikipedia-API~=0.8.1
