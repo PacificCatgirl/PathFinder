@@ -30,11 +30,11 @@ class MainWindow(QWidget):
         layout = QVBoxLayout()
 
         self.startPageInput = QLineEdit(self)
-        self.startPageInput.setPlaceholderText("Отсюда")
+        self.startPageInput.setPlaceholderText("Откуда")
         layout.addWidget(self.startPageInput)
 
         self.endPageInput = QLineEdit(self)
-        self.endPageInput.setPlaceholderText("Сюда")
+        self.endPageInput.setPlaceholderText("Куда")
         layout.addWidget(self.endPageInput)
 
         self.button = QPushButton("Искать", self)
