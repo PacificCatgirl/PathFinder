@@ -5,17 +5,16 @@ import wikipediaapi
 
 
 def print_links(page):
-    time.sleep(0.3)
     return list(page.links.values())
 
 
-def create_graph(start_page, finish_page,  max_nodes):
+def create_graph(start_page, finish_page, max_nodes):
     G = {}
     visited = set()
-    queue = [start_page]
+    queue = deque([start_page])
 
     while queue and len(visited) < max_nodes:
-        current_page = queue.pop(0)
+        current_page = queue.popleft()
         current_title = current_page.title
 
         if current_title not in visited:
@@ -23,24 +22,26 @@ def create_graph(start_page, finish_page,  max_nodes):
             neighbors = print_links(current_page)
 
 
-            G[current_title] = {}
+            G[current_title] = []
+
             for neighbor in neighbors:
                 neighbor_title = neighbor.title
-                G[current_title][neighbor_title] = 1
+                G[current_title].append(neighbor_title)
+
                 if neighbor_title not in G:
-                    G[neighbor_title] = {}
+                    G[neighbor_title] = []
+
                 if neighbor_title == finish_page.title:
                     return G
-
-
 
             for neighbor in neighbors:
                 if neighbor.title not in visited:
                     queue.append(neighbor)
+
     return G
 
 
-def dijkstra(graph, start, finish):
+def bfs_shortest_path(graph, start, finish):
     if start not in graph:
         print(f"Стартовый узел '{start}' отсутствует в графе")
         return None
@@ -48,36 +49,24 @@ def dijkstra(graph, start, finish):
         print(f"Целевой узел '{finish}' отсутствует в графе")
         return None
 
-    distances = {node: float('inf') for node in graph}
-    distances[start] = 0
-    previous_nodes = {node: None for node in graph}
-    priority_queue = [(0, start)]
+    queue = deque()
+    queue.append([start])
 
-    while priority_queue:
-        current_distance, current_node = heapq.heappop(priority_queue)
+    visited = set()
+    visited.add(start)
 
-        if current_node == finish:
-            break
+    while queue:
+        path = queue.popleft()
+        node = path[-1]
 
-        if current_distance > distances[current_node]:
-            continue
+        if node == finish:
+            return path
 
-        for neighbor, weight in graph[current_node].items():
-            if neighbor not in graph:
-                continue
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                new_path = list(path)
+                new_path.append(neighbor)
+                queue.append(new_path)
 
-            new_dist = current_distance + weight
-            if new_dist < distances[neighbor]:
-                distances[neighbor] = new_dist
-                previous_nodes[neighbor] = current_node
-                heapq.heappush(priority_queue, (new_dist, neighbor))
-
-    path = []
-    current = finish
-    while current is not None:
-        path.append(current)
-        current = previous_nodes.get(current)
-
-    path.reverse()
-
-    return path if path and path[0] == start else None
+    return None
